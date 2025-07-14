@@ -9,6 +9,27 @@ cors:
   allow_any_origin: true
   allow_headers: ["*"]
 
+headers:
+  all:
+    request:
+      - propagate:
+          named: "x-user-id"
+
+preview_entity_cache:
+  enabled: true
+  subgraph:
+    all:
+      enabled: true
+      redis:
+        urls: ["redis://redis:6379"]
+        ttl: 3600s
+    subgraphs: 
+      accounts:
+        private_id: "user_id"
+
+rhai:
+  scripts: "/dist/rhai"
+
 sandbox:
   enabled: true
 homepage:

@@ -65,6 +65,7 @@ services:
     volumes:
       - ./apollo-router/router.yaml:/dist/config/router.yaml
       - ./apollo-router/supergraph.graphql:/dist/config/supergraph.graphql
+      - ./apollo-router/rhai:/dist/rhai
     environment:
       - APOLLO_ROUTER_CONFIG_PATH=/dist/config/router.yaml
       - APOLLO_ROUTER_SUPERGRAPH_PATH=/dist/config/supergraph.graphql
