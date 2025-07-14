@@ -34,7 +34,7 @@ The project consists of:
 
 3. **Stop services:**
    ```bash
-   docker-compose down
+   docker compose down
    ```
 
 ## Usage Examples
@@ -43,35 +43,37 @@ The project consists of:
 
 **Get upcoming events:**
 ```graphql
-query {
+query UpcomingEvents{
   upcomingEvents {
-    homeParticipant {
-      ... on Team {
-        resourceUri
-        fullName
-        abbreviation
-      }
-      ... on Player {
-        resourceUri
-        fullName
-        shortName
-      }
-    }
     awayParticipant {
-      ... on Team {
-        resourceUri
-        fullName
-        abbreviation
-      }
-      ... on Player {
-        resourceUri
-        fullName
-        shortName
-      }
+      ...Team
+      ...Player
+      __typename
+    }
+    homeParticipant {
+      ...Team
+      ...Player
+      __typename
     }
   }
 }
+
+fragment Team on Team {
+  resourceUri
+  fullName
+  abbreviation
+  isFavorite
+}
+
+fragment Player on Player {
+  resourceUri
+  fullName
+  shortName
+  isFavorite
+}
 ```
+
+You can send a header value of `x-user-id: user_1` or `x-user-id: user_2` to simulate retrieving data for two different users. 
 
 **Get cache entries:**
 ```graphql
@@ -127,7 +129,7 @@ entity-caching-demo/
 
 ### Adding to the Supergraph
 
-The current supergraph schema is a basic placeholder. To generate the proper federated schema:
+To generate the proper federated schema:
 
 1. Start the individual subgraphs
 2. Use Apollo's `rover` CLI to compose the supergraph:
@@ -160,13 +162,25 @@ Each subgraph supports dynamic cache header configuration:
 - **Account**: `updateAccountCacheHeader(header: String)`
 - **Marketplace**: `updateMarketplaceCacheHeader(header: String)`
 
+You can change them in batch by executing the following mutation:
+
+```graphql
+mutation UpdateCacheSettings{
+  updateMarketplaceCacheHeader(header: "s-maxage=3600")
+  updateAccountCacheHeader(header:"max-age=300")
+  updateSportsDataCacheHeader(header: "s-maxage=3600")
+}
+```
+
+
+
 These mutations allow you to experiment with different caching strategies in real-time.
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Port conflicts**: Ensure ports 4000-4004 and 6379 are available
+1. **Port conflicts**: Ensure ports 4000-4004 and 6380 are available
 2. **Docker not running**: Start Docker Desktop
 3. **Services not starting**: Check logs with `docker-compose logs -f [service-name]`
 
@@ -182,8 +196,8 @@ docker-compose logs -f redis
 ## Entity Cache Configuration
 
 The Apollo Router is configured with:
-- Redis backend on `redis://redis:6379`
-- 24-hour default TTL
+- Redis backend on `redis://redis:6379` from within docker or `redis://localhost:6380` from your host machine
+- 1-hour default TTL
 - Entity caching enabled for all subgraphs
 
 Modify `apollo-router/router.yaml` to adjust cache settings.
