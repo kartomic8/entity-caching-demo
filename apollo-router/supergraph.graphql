@@ -1,0 +1,127 @@
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0")
+  @link(url: "https://specs.apollo.dev/join/v0.4", for: EXECUTION)
+{
+  query: Query
+  mutation: Mutation
+}
+
+directive @join__directive(graphs: [join__Graph!], name: String!, args: join__DirectiveArguments) repeatable on SCHEMA | OBJECT | INTERFACE | FIELD_DEFINITION
+
+directive @join__enumValue(graph: join__Graph!) repeatable on ENUM_VALUE
+
+directive @join__field(graph: join__Graph, requires: join__FieldSet, provides: join__FieldSet, type: String, external: Boolean, override: String, usedOverridden: Boolean, overrideLabel: String) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+
+directive @join__implements(graph: join__Graph!, interface: String!) repeatable on OBJECT | INTERFACE
+
+directive @join__type(graph: join__Graph!, key: join__FieldSet, extension: Boolean! = false, resolvable: Boolean! = true, isInterfaceObject: Boolean! = false) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
+
+directive @join__unionMember(graph: join__Graph!, member: String!) repeatable on UNION
+
+directive @link(url: String, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+type CacheEntry
+  @join__type(graph: CACHE_VIEWER)
+{
+  key: String!
+  value: String
+  ttl: String
+}
+
+type EventCard
+  @join__type(graph: MARKETPLACE)
+{
+  homeParticipant: Participant
+  awayParticipant: Participant
+}
+
+scalar join__DirectiveArguments
+
+scalar join__FieldSet
+
+enum join__Graph {
+  ACCOUNT @join__graph(name: "account", url: "http://account:4000/graphql")
+  CACHE_VIEWER @join__graph(name: "cache-viewer", url: "http://cache-viewer:4000/graphql")
+  MARKETPLACE @join__graph(name: "marketplace", url: "http://marketplace:4000/graphql")
+  SPORTS_DATA @join__graph(name: "sports-data", url: "http://sports-data:4000/graphql")
+}
+
+scalar link__Import
+
+enum link__Purpose {
+  """
+  `SECURITY` features provide metadata necessary to securely resolve fields.
+  """
+  SECURITY
+
+  """
+  `EXECUTION` features provide metadata necessary for operation execution.
+  """
+  EXECUTION
+}
+
+type Mutation
+  @join__type(graph: ACCOUNT)
+  @join__type(graph: MARKETPLACE)
+  @join__type(graph: SPORTS_DATA)
+{
+  updateAccountCacheHeader(header: String): Result @join__field(graph: ACCOUNT)
+  updateMarketplaceCacheHeader(header: String): Result @join__field(graph: MARKETPLACE)
+  updateSportsDataCacheHeader(header: String): Result @join__field(graph: SPORTS_DATA)
+}
+
+union Participant
+  @join__type(graph: MARKETPLACE)
+  @join__unionMember(graph: MARKETPLACE, member: "Team")
+  @join__unionMember(graph: MARKETPLACE, member: "Player")
+ = Team | Player
+
+type Player
+  @join__type(graph: ACCOUNT, key: "resourceUri")
+  @join__type(graph: MARKETPLACE, key: "resourceUri", resolvable: false)
+  @join__type(graph: SPORTS_DATA, key: "resourceUri")
+{
+  resourceUri: String!
+  isFavorite: Boolean @join__field(graph: ACCOUNT)
+  fullName: String! @join__field(graph: SPORTS_DATA)
+  shortName: String! @join__field(graph: SPORTS_DATA)
+}
+
+type Query
+  @join__type(graph: ACCOUNT)
+  @join__type(graph: CACHE_VIEWER)
+  @join__type(graph: MARKETPLACE)
+  @join__type(graph: SPORTS_DATA)
+{
+  getCacheEntries: [CacheEntry!]! @join__field(graph: CACHE_VIEWER)
+  upcomingEvents: [EventCard!]! @join__field(graph: MARKETPLACE)
+}
+
+enum Result
+  @join__type(graph: ACCOUNT)
+  @join__type(graph: MARKETPLACE)
+  @join__type(graph: SPORTS_DATA)
+{
+  OK @join__enumValue(graph: ACCOUNT) @join__enumValue(graph: MARKETPLACE) @join__enumValue(graph: SPORTS_DATA)
+  ERROR @join__enumValue(graph: ACCOUNT) @join__enumValue(graph: MARKETPLACE) @join__enumValue(graph: SPORTS_DATA)
+}
+
+type Team
+  @join__type(graph: ACCOUNT, key: "resourceUri")
+  @join__type(graph: MARKETPLACE, key: "resourceUri", resolvable: false)
+  @join__type(graph: SPORTS_DATA, key: "resourceUri")
+{
+  resourceUri: String!
+  isFavorite: Boolean @join__field(graph: ACCOUNT)
+  fullName: String! @join__field(graph: SPORTS_DATA)
+  abbreviation: String! @join__field(graph: SPORTS_DATA)
+}
+
+type User
+  @join__type(graph: ACCOUNT, key: "id")
+{
+  id: ID!
+  nickname: String!
+}

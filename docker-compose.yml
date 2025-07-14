@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
+  sports-data:
+    build:
+      context: ./sports-data
+      dockerfile: Dockerfile
+    ports:
+      - "4001:4000"
+    environment:
+      - PORT=4000
+      - MIX_ENV=prod
+    depends_on:
+      - redis
+
+  account:
+    build:
+      context: ./account
+      dockerfile: Dockerfile
+    ports:
+      - "4002:4000"
+    environment:
+      - PORT=4000
+      - MIX_ENV=prod
+    depends_on:
+      - redis
+
+  marketplace:
+    build:
+      context: ./marketplace
+      dockerfile: Dockerfile
+    ports:
+      - "4003:4000"
+    environment:
+      - PORT=4000
+      - MIX_ENV=prod
+    depends_on:
+      - redis
+
+  cache-viewer:
+    build:
+      context: ./cache-viewer
+      dockerfile: Dockerfile
+    ports:
+      - "4004:4000"
+    environment:
+      - PORT=4000
+      - MIX_ENV=prod
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+
+  apollo-router:
+    image: ghcr.io/apollographql/router:v2.3.0
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./apollo-router/router.yaml:/dist/config/router.yaml
+      - ./apollo-router/supergraph.graphql:/dist/config/supergraph.graphql
+    environment:
+      - APOLLO_ROUTER_CONFIG_PATH=/dist/config/router.yaml
+      - APOLLO_ROUTER_SUPERGRAPH_PATH=/dist/config/supergraph.graphql
+    depends_on:
+      - sports-data
+      - account
+      - marketplace
+      - cache-viewer
+      - redis
+
+volumes:
+  redis_data:
