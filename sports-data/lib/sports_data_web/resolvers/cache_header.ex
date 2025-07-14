@@ -5,19 +5,19 @@ defmodule SportsDataWeb.Resolvers.CacheHeader do
 
   def update_cache_header(_, %{header: header}, _) when is_nil(header) or header == "" do
     # Clear cache header
-    Process.put(:cache_header, nil)
+    SportsData.CacheHeaderValue.clear()
     {:ok, :ok}
   end
 
   def update_cache_header(_, %{header: header}, _) do
     # Set cache header
-    Process.put(:cache_header, header)
+    SportsData.CacheHeaderValue.set(header)
     {:ok, :ok}
   end
 
   def update_cache_header(_, _, _) do
     # No header provided, clear it
-    Process.put(:cache_header, nil)
+    SportsData.CacheHeaderValue.clear()
     {:ok, :ok}
   end
 end

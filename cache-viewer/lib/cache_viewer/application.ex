@@ -33,10 +33,10 @@ defmodule CacheViewer.Application do
 
   defp redis_port do
     case System.get_env("REDIS_URL") do
-      nil -> 6379
+      nil -> 6380
       url ->
         uri = URI.parse(url)
-        uri.port || 6379
+        uri.port || 6380
     end
   end
 end

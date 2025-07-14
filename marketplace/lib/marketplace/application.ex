@@ -8,7 +8,8 @@ defmodule Marketplace.Application do
     children = [
       MarketplaceWeb.Telemetry,
       {Phoenix.PubSub, name: Marketplace.PubSub},
-      MarketplaceWeb.Endpoint
+      MarketplaceWeb.Endpoint,
+      {Marketplace.CacheHeaderValue, "private, max-age=0, must-revalidate"}
     ]
 
     opts = [strategy: :one_for_one, name: Marketplace.Supervisor]

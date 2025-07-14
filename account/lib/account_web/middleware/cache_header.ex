@@ -9,7 +9,7 @@ defmodule AccountWeb.Middleware.CacheHeader do
       "" -> resolution
       header -> 
         resolution
-        |> put_cache_header(header)
+        # |> put_cache_header(header)
         |> put_context_cache_header(header)
     end
   end

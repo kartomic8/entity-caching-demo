@@ -8,7 +8,8 @@ defmodule SportsData.Application do
     children = [
       SportsDataWeb.Telemetry,
       {Phoenix.PubSub, name: SportsData.PubSub},
-      SportsDataWeb.Endpoint
+      SportsDataWeb.Endpoint,
+      {SportsData.CacheHeaderValue, "private, max-age=0, must-revalidate"}
     ]
 
     opts = [strategy: :one_for_one, name: SportsData.Supervisor]

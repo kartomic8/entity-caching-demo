@@ -8,7 +8,8 @@ defmodule Account.Application do
     children = [
       AccountWeb.Telemetry,
       {Phoenix.PubSub, name: Account.PubSub},
-      AccountWeb.Endpoint
+      AccountWeb.Endpoint,
+      {Account.CacheHeaderValue, "private, max-age=0, must-revalidate, foo"}
     ]
 
     opts = [strategy: :one_for_one, name: Account.Supervisor]

@@ -1,3 +1,11 @@
+defmodule Account.Team do
+  defstruct [:resource_uri, :is_favorite]
+end
+
+defmodule Account.Player do
+  defstruct [:resource_uri, :is_favorite]
+end
+
 defmodule Account.DataStore do
   @moduledoc """
   Hardcoded data store for account entities.

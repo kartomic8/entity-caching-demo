@@ -15,7 +15,7 @@ defmodule AccountWeb.Schema do
     field(:id, non_null(:id))
     field(:nickname, non_null(:string))
     
-    field :_resolve_reference, :user, resolve: fn %{id: id}, _, _ ->
+    field :_resolve_reference, :user, resolve: fn %{id: id}, _ ->
       case Account.DataStore.get_user(id) do
         nil -> {:error, "User not found"}
         user -> {:ok, user}
@@ -35,8 +35,9 @@ defmodule AccountWeb.Schema do
       end)
     end
     
-    field :_resolve_reference, :team, resolve: (fn %{resource_uri: resource_uri}, _, %{context: %{user_id: user_id}} ->
-      {:ok, %{resource_uri: resource_uri, is_favorite: Account.DataStore.is_team_favorite(user_id, resource_uri)}}
+    field :_resolve_reference, :team, resolve: (fn %{resource_uri: resource_uri}, %{context: %{user_id: user_id}} ->
+      IO.puts("USER_ID: #{user_id}")
+      {:ok, %Account.Team{resource_uri: resource_uri, is_favorite: Account.DataStore.is_team_favorite(user_id, resource_uri)}}
     end)
   end
 
@@ -52,8 +53,8 @@ defmodule AccountWeb.Schema do
       end)
     end
     
-    field :_resolve_reference, :player, resolve: (fn %{resource_uri: resource_uri}, _, %{context: %{user_id: user_id}} ->
-      {:ok, %{resource_uri: resource_uri, is_favorite: Account.DataStore.is_player_favorite(user_id, resource_uri)}}
+    field :_resolve_reference, :player, resolve: (fn %{resource_uri: resource_uri}, %{context: %{user_id: user_id}} ->
+      {:ok, %Account.Player{resource_uri: resource_uri, is_favorite: Account.DataStore.is_player_favorite(user_id, resource_uri)}}
     end)
   end
 
@@ -77,7 +78,7 @@ defmodule AccountWeb.Schema do
     [Absinthe.Middleware.Dataloader] ++ Absinthe.Plugin.defaults()
   end
 
-  def middleware(middleware, _field, _object) do
-    middleware ++ [AccountWeb.Middleware.CacheHeader]
-  end
+  # def middleware(middleware, _field, _object) do
+  #   middleware ++ [AccountWeb.Middleware.CacheHeader]
+  # end
 end

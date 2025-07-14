@@ -4,7 +4,8 @@ defmodule AccountWeb.Plugs.UserHeader do
   def init(opts), do: opts
 
   def call(conn, _opts) do
-    user_id = get_req_header(conn, "x-user-id") |> List.first()
+    user_id = get_req_header(conn, "x-user-id") |> List.first() |> IO.inspect(label: "USER_ID parsed from header: ")
+    
     context = %{user_id: user_id}
     Absinthe.Plug.put_options(conn, context: context)
   end
