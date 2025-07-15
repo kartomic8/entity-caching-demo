@@ -180,6 +180,7 @@ These mutations allow you to experiment with different caching strategies in rea
 
 ### Common Issues
 
+1. **License Issue**: The entity cache requires a GraphOS enterprise license.  To get around licensing errors from the router, you will have to specify values for the following environment variables: `APOLLO_KEY` and `APOLLO_GRAPH_REF`
 1. **Port conflicts**: Ensure ports 4000-4004 and 6380 are available
 2. **Docker not running**: Start Docker Desktop
 3. **Services not starting**: Check logs with `docker-compose logs -f [service-name]`

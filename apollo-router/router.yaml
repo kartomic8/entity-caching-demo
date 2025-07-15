@@ -25,6 +25,7 @@ preview_entity_cache:
         ttl: 3600s
     subgraphs: 
       accounts:
+        enabled: true
         private_id: "user_id"
 
 rhai:
