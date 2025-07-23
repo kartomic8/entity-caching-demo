@@ -24,7 +24,8 @@ preview_entity_cache:
         urls: ["redis://redis:6379"]
         ttl: 3600s
     subgraphs: 
-      accounts:
+      account:
+        enabled: true
         private_id: "user_id"
 
 rhai:
