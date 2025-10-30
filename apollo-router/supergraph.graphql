@@ -44,6 +44,7 @@ scalar join__FieldSet
 enum join__Graph {
   ACCOUNT @join__graph(name: "account", url: "http://account:4000/graphql")
   CACHE_VIEWER @join__graph(name: "cache-viewer", url: "http://cache-viewer:4000/graphql")
+  HEADSHOTS @join__graph(name: "headshots", url: "http://headshots:4000/graphql")
   MARKETPLACE @join__graph(name: "marketplace", url: "http://marketplace:4000/graphql")
   SPORTS_DATA @join__graph(name: "sports-data", url: "http://sports-data:4000/graphql")
 }
@@ -64,10 +65,12 @@ enum link__Purpose {
 
 type Mutation
   @join__type(graph: ACCOUNT)
+  @join__type(graph: HEADSHOTS)
   @join__type(graph: MARKETPLACE)
   @join__type(graph: SPORTS_DATA)
 {
   updateAccountCacheHeader(header: String): Result @join__field(graph: ACCOUNT)
+  updateHeadshotsCacheHeader(header: String): Result @join__field(graph: HEADSHOTS)
   updateMarketplaceCacheHeader(header: String): Result @join__field(graph: MARKETPLACE)
   updateSportsDataCacheHeader(header: String): Result @join__field(graph: SPORTS_DATA)
 }
@@ -80,11 +83,13 @@ union Participant
 
 type Player
   @join__type(graph: ACCOUNT, key: "resourceUri")
+  @join__type(graph: HEADSHOTS, key: "resourceUri")
   @join__type(graph: MARKETPLACE, key: "resourceUri", resolvable: false)
   @join__type(graph: SPORTS_DATA, key: "resourceUri")
 {
   resourceUri: String!
   isFavorite: Boolean @join__field(graph: ACCOUNT)
+  headshotUrl(size: Size!): String @join__field(graph: HEADSHOTS)
   fullName: String! @join__field(graph: SPORTS_DATA)
   shortName: String! @join__field(graph: SPORTS_DATA)
 }
@@ -92,6 +97,7 @@ type Player
 type Query
   @join__type(graph: ACCOUNT)
   @join__type(graph: CACHE_VIEWER)
+  @join__type(graph: HEADSHOTS)
   @join__type(graph: MARKETPLACE)
   @join__type(graph: SPORTS_DATA)
 {
@@ -101,11 +107,20 @@ type Query
 
 enum Result
   @join__type(graph: ACCOUNT)
+  @join__type(graph: HEADSHOTS)
   @join__type(graph: MARKETPLACE)
   @join__type(graph: SPORTS_DATA)
 {
-  OK @join__enumValue(graph: ACCOUNT) @join__enumValue(graph: MARKETPLACE) @join__enumValue(graph: SPORTS_DATA)
-  ERROR @join__enumValue(graph: ACCOUNT) @join__enumValue(graph: MARKETPLACE) @join__enumValue(graph: SPORTS_DATA)
+  OK @join__enumValue(graph: ACCOUNT) @join__enumValue(graph: HEADSHOTS) @join__enumValue(graph: MARKETPLACE) @join__enumValue(graph: SPORTS_DATA)
+  ERROR @join__enumValue(graph: ACCOUNT) @join__enumValue(graph: HEADSHOTS) @join__enumValue(graph: MARKETPLACE) @join__enumValue(graph: SPORTS_DATA)
+}
+
+enum Size
+  @join__type(graph: HEADSHOTS)
+{
+  SMALL @join__enumValue(graph: HEADSHOTS)
+  MEDIUM @join__enumValue(graph: HEADSHOTS)
+  LARGE @join__enumValue(graph: HEADSHOTS)
 }
 
 type Team

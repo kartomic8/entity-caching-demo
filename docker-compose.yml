@@ -58,6 +58,18 @@ services:
     depends_on:
       - redis
 
+  headshots:
+    build:
+      context: ./headshots
+      dockerfile: Dockerfile
+    ports:
+      - "4005:4000"
+    environment:
+      - PORT=4000
+      - MIX_ENV=prod
+    depends_on:
+      - redis
+
   apollo-router:
     image: ghcr.io/apollographql/router:v2.3.0
     ports:
@@ -69,11 +81,13 @@ services:
     environment:
       - APOLLO_ROUTER_CONFIG_PATH=/dist/config/router.yaml
       - APOLLO_ROUTER_SUPERGRAPH_PATH=/dist/config/supergraph.graphql
+      - APOLLO_ROUTER_LOG=trace
     depends_on:
       - sports-data
       - account
       - marketplace
       - cache-viewer
+      - headshots
       - redis
 
 volumes:

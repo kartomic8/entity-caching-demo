@@ -16,3 +16,7 @@ subgraphs:
     routing_url: http://cache-viewer:4000/graphql
     schema:
       subgraph_url: http://localhost:4004/graphql
+  headshots:
+    routing_url: http://headshots:4000/graphql
+    schema:
+      subgraph_url: http://localhost:4005/graphql
