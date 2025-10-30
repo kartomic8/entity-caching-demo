@@ -109,6 +109,7 @@ mutation {
   updateSportsDataCacheHeader(header: "max-age=300")
   updateAccountCacheHeader(header: "max-age=60")
   updateMarketplaceCacheHeader(header: "max-age=120")
+  updateHeadshotsCacheHeader(header: "max-age=3600")
 }
 ```
 
@@ -153,6 +154,56 @@ mix phx.server
 2. **Check cache entries** using the cache viewer
 3. **Modify cache headers** using mutations
 4. **Observe caching behavior** by running the same queries
+
+### Testing Entity Caching with Field Arguments
+
+The `Player` entity includes a `headshotUrl` field that accepts a `size` argument (SMALL, MEDIUM, LARGE). This demonstrates how Apollo Router caches entities with different field argument values separately.
+
+**1. Query the same player with different size arguments:**
+```graphql
+query {
+  upcomingEvents {
+    homeParticipant {
+      ... on Player {
+        resourceUri
+        fullName
+        smallHeadshot: headshotUrl(size: SMALL)
+      }
+    }
+  }
+}
+
+query {
+  upcomingEvents {
+    homeParticipant {
+      ... on Player {
+        resourceUri
+        fullName
+        smallHeadshot: headshotUrl(size: LARGE)
+      }
+    }
+  }
+}
+
+```
+
+**2. Check cache entries to see separate cache keys:**
+```graphql
+query {
+  getCacheEntries {
+    key
+    value
+    ttl
+  }
+}
+```
+
+You should see separate cache entries for each player with different `size` argument values. The cache keys will include the field arguments to differentiate them.
+
+**3. Test cache behavior by:**
+- Running the query multiple times and observing that subsequent requests are served from cache
+- Modifying the headshots cache header: `mutation { updateHeadshotsCacheHeader(header: "max-age=60") }`
+- Querying with different size values and verifying each creates its own cache entry
 
 ## Cache Headers
 
